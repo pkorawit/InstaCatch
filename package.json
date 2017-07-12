@@ -1,0 +1,17 @@
+{
+  "name": "InstaCatch",
+  "version": "1.0.0",
+  "description": "catch Instragram posts",
+  "main": "index.js",
+  "author": "K0rN",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.15.3",
+    "mongoose": "^4.11.1",
+    "readline-sync": "^1.4.7",
+    "request": "^2.81.0"
+  }
+}
