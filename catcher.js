@@ -3,10 +3,13 @@ var igtag = require('./lib/igtag');
 var igloc = require('./lib/igloc');
 var config = require('./config');
 
+var dburl = 'mongodb://admin:admin@ds121456.mlab.com:21456/instagram';
+
 // Connect to DB
-mongoose.connect('mongodb://localhost:27017/instagram', {
+mongoose.connect(dburl, {
     useMongoClient: true
 });
+
 // Set custom promise to Bluebird
 mongoose.Promise = require('bluebird');
 
