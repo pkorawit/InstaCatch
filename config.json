@@ -1,5 +1,5 @@
 {
     "hastags" : [ "patong", "patongbeach", "phuket" ],
-    "locations" : ["757207048","213634987","575001616"],
-    "interval" : 10000
+    "locations" : ["757207048"],
+    "interval" : 300000
 }

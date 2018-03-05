@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
-var igtag = require('./lib/igtag');
-var igloc = require('./lib/igloc');
 var config = require('./config');
+var Instagram = require('./lib/instafetch');
+var PostDocument = require('./lib/app/models/post');
+Instagram = new Instagram();
 
-var dburl = 'mongodb://admin:admin@ds121456.mlab.com:21456/instagram';
+var dburl = 'mongodb://mean.psu.ac.th:27017/ptie';
 
 // Connect to DB
 mongoose.connect(dburl, {
@@ -13,36 +14,43 @@ mongoose.connect(dburl, {
 // Set custom promise to Bluebird
 mongoose.Promise = require('bluebird');
 
-function startCatch() {
-    //Get by Tags
-    try {
-        for(var tag in config.hastags){        
-            var url = `https://www.instagram.com/explore/tags/${config.hastags[tag]}/`;
-            igtag.get(url, function (message) {
-                console.log(`\ntime: ${Date()}\nhashtag: ${config.hastags[tag]}\nstatus: ${message.status}\n`);
-            });        
-        }        
-    } catch (error) {
-        console.log(error);
-    }
+async function fetch() {
 
-    //Get by Locations
-    try {
-        for(var loc in config.locations){        
-            var url = `https://www.instagram.com/explore/locations/${config.locations[loc]}/`;
-            igloc.get(url, function (message) {
-                console.log(`\ntime: ${Date()}\nlocation: ${config.locations[loc]}\nstatus: ${message.status}\n`);
-            });        
-        }        
-    } catch (error) {
-        console.log(error);
-    }    
+    for(var loc in config.locations){     
+        var locationdata = await Instagram.getDataByLocation(config.locations[loc]);  
+        var entries = locationdata.location.media.nodes;
+        console.log('Found entries: ' + entries.length);
+        for(var i = 0; i < entries.length; i++){
+            var postdata = await Instagram.getPostByShortcode(entries[i].code);                        
+           
+            //Store data to DB
+            var postdb = new PostDocument;
+            //Check if the selecte entry is existed in database
+            PostDocument.findOne({shortcode: postdata.shortcode}, function (err, exist){ 
+                if(exist){
+                    console.log(postdata.shortcode + " : already existed");
+                }
+                else{
+                    //Insert new data to db 
+                    postdb.created_at = Date.now();
+                    postdb.shortcode = postdata.shortcode;
+                    postdb.media = postdata;
+                    postdb.save(function (err) {
+                        if (err) return handleError(err);                        
+                        console.log(postdata.shortcode + " : saved");
+                    });
+                }
+            }); 
+        } 
+        console.log(`\ntime: ${Date()}\nlocation: ${config.locations[loc]}\nstatus: finished\n`);           
+    }        
+
 }
 
-console.log('Start catching ...');
-startCatch();
+console.log('Start fetching ...');
+fetch();
 function intervalFunc() {
-    startCatch();
+    fetch();
 }
 setInterval(intervalFunc, config.interval);
 
