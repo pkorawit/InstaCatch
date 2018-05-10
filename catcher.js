@@ -53,7 +53,7 @@ async function fetch() {
     for (var tag in config.hastags) {
         var hashtagdata = await Instagram.getDataByHashtag(config.hastags[tag]);
         var entries = hashtagdata.edges;
-        console.log('Hashtag[' + config.locations[loc] + '] entries: ' + entries.length);
+        console.log('Hashtag[' + config.hastags[tag] + '] entries: ' + entries.length);
         for (var i = 0; i < entries.length; i++) {
             var postdata = await Instagram.getPostByShortcode(entries[i].node.shortcode);
             //Store data to DB
