@@ -17,11 +17,14 @@ mongoose.Promise = require('bluebird');
 async function fetch() {
 
     for(var loc in config.locations){     
-        var locationdata = await Instagram.getDataByLocation(config.locations[loc]);  
-        var entries = locationdata.location.media.nodes;
+        var locationdata = await Instagram.getDataByLocation(config.locations[loc]);          
+        //var entries = locationdata.location.media.nodes; //Instagram API updated found on 11 May 2018
+        var entries = locationdata.graphql.location.edge_location_to_media.edges;
         console.log('Found entries: ' + entries.length);
         for(var i = 0; i < entries.length; i++){
-            var postdata = await Instagram.getPostByShortcode(entries[i].code);                        
+
+            //console.log(entries[0]);
+            var postdata = await Instagram.getPostByShortcode(entries[i].node.shortcode);  //Instagram API updated found on 11 May 2018                       
            
             //Store data to DB
             var postdb = new PostDocument;
